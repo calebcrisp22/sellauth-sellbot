@@ -22,6 +22,7 @@ import {
   openClaimOrderModal
 } from './lib/claimInteractions.js';
 import { evaluateAccess } from './lib/permissions.js';
+import { registerCommands } from './lib/registerCommands.js';
 import { SellAuthApiError, SellAuthClient } from './sellauth/client.js';
 
 const config = loadConfig();
@@ -94,6 +95,14 @@ function startStatusRotation(readyClient: ReadyDiscordClient<true>): void {
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`SellBot is online as ${readyClient.user.tag}`);
   startStatusRotation(readyClient);
+
+  registerCommands(config, botConfig)
+    .then(() => {
+      console.log('Slash command registration complete.');
+    })
+    .catch((error: unknown) => {
+      console.error('Failed to register slash commands:', error);
+    });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
